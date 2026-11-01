@@ -1,0 +1,32 @@
+# @package _global_
+
+# ACCAD Female1Walking_c3d: 28 clips with one female body-shape fit.
+# T-pose estimate using the existing calibration transforms and mapped G1 links.
+# Weighted joint RMS: defaults 75.38 mm; estimate 43.67 mm.
+# Review on actual motions with process; rotation retains the AMASS convention.
+defaults:
+- /task/unitree_g1/amass
+- _self_
+mocap:
+  scale:
+  - 0.75395293
+  - 0.85074462
+  - 0.80371016
+  rotation:
+  - 6.123233995736766e-17
+  - -1.0
+  - 0.0
+  - 1.0
+  - 6.123233995736766e-17
+  - 0.0
+  - 0.0
+  - 0.0
+  - 1.0
+  offset:
+  - 0.03339503
+  - 0.00036538
+  - 0.01289113
+upper_body_offset:
+- -0.02630012
+- 0.00182256
+- 0.00797291

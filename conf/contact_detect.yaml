@@ -1,0 +1,17 @@
+# @package _global_
+
+# Settings for tools/dynamics_processing/contact_detect.py.
+# Saved contact labels come from mocap heights; MuJoCo contacts provide a comparison.
+defaults:
+  - base  # Inherit the shared start_index and end_index frame range.
+  - _self_
+
+motion_path: null  # Required input trajectory (.npy or .npz) with q and mocap data.
+mujoco_xml_path: null  # Required MuJoCo XML matching the trajectory's robot.
+contact_links: []  # Required robot body names that receive contact labels.
+contact_filter_size: 10  # Median-filter window in frames; 1 disables filtering.
+output_path: null  # Null creates <input_stem>_contact_<start>_<end> beside the input.
+plot: false  # Save a PDF comparing robot contacts with mocap contact labels.
+root_z_offset: 0.0  # Vertical shift in meters for robot contact comparison only.
+mocap_joints: []  # Required mocap names paired with contact_links in the same order.
+mocap_threshold: 0.03  # Contact when a joint is within this many meters of its minimum height.

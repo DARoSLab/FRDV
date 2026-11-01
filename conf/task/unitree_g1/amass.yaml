@@ -1,0 +1,112 @@
+# @package _global_
+
+# AMASS NPZ motions retargeted to Unitree G1; override mocap_src_path with an NPZ path.
+data_type: amass  # Select the AMASS loader.
+defaults:
+- /base  # Inherit shared retargeting and solver settings.
+- _self_
+# Robot contact frames constrained to stay at or above the ground (z = 0).
+foot_links:
+- R_foot_contact_0
+- L_foot_contact_0
+- L_foot_contact_1
+- L_foot_contact_2
+- L_foot_contact_3
+- L_foot_contact_4
+- R_foot_contact_1
+- R_foot_contact_2
+- R_foot_contact_3
+- R_foot_contact_4
+# bvh is the shared key for human joint names, including AMASS joints; robot names a body.
+# Larger weights give a joint higher tracking priority.
+mapping:
+- bvh: Spine1
+  robot: pelvis
+  weight: 1000
+- bvh: L_Hip
+  robot: left_hip_pitch_link
+  weight: 1000
+- bvh: L_Knee
+  robot: left_knee_link
+  weight: 1000
+- bvh: L_Foot
+  robot: left_toe_link
+  weight: 1000
+- bvh: R_Hip
+  robot: right_hip_pitch_link
+  weight: 1000
+- bvh: R_Knee
+  robot: right_knee_link
+  weight: 1000
+- bvh: R_Foot
+  robot: right_toe_link
+  weight: 1000
+- bvh: L_Shoulder
+  robot: left_shoulder_pitch_link
+  weight: 1000
+- bvh: L_Elbow
+  robot: left_elbow_link
+  weight: 1000
+- bvh: L_Wrist
+  robot: left_wrist_yaw_link
+  weight: 1000
+- bvh: R_Shoulder
+  robot: right_shoulder_pitch_link
+  weight: 1000
+- bvh: R_Elbow
+  robot: right_elbow_link
+  weight: 1000
+- bvh: R_Wrist
+  robot: right_wrist_yaw_link
+  weight: 1000
+- bvh: R_Ankle
+  robot: right_ankle_pitch_link
+  weight: 2000
+- bvh: L_Ankle
+  robot: left_ankle_pitch_link
+  weight: 2000
+
+# Default alignment; select a subject_scaling/amass task for subject overrides.
+mocap:
+  ground: false  # Preserve recorded-motion height; true enables ankle-based grounding before scaling.
+  # Ankle clearance in source meters; the calibration T-pose uses clearance * scale[2] above the scene floor.
+  ground_clearance: 0.05  # Also used by recorded motions when ground is true.
+  # Translation [x, y, z] in meters, applied after alignment and grounding.
+  offset:
+  - 0.04
+  - 0.0
+  - 0.0
+  # Coordinate conversion as a flattened 3-by-3 matrix, listed row by row.
+  rotation:
+  - 6.123233995736766e-17
+  - -1.0
+  - 0.0
+  - 1.0
+  - 6.123233995736766e-17
+  - 0.0
+  - 0.0
+  - 0.0
+  - 1.0
+  # Default input x/y/z scale before rotation; a selected subject YAML can override it.
+  scale:
+  - 0.87
+  - 0.83
+  - 0.75
+# process writes the calibrated XML; retarget and play load that processed model.
+mujoco_dst_xml_path: assets/robots/unitree_g1/g1_mocap_29dof_mocap_processed_amass.xml
+mujoco_src_xml_path: assets/robots/unitree_g1/g1_mocap_29dof_mocap.xml  # Initial robot model.
+robot: unitree_g1  # Robot identifier for output folders and solver caches.
+# Original 16-beta SMPL+H directory containing <gender>/model.npz.
+smplh_model_path: ${oc.env:SMPLH_MODEL_PATH,null}
+wandb:
+  project: unitree_g1_amass  # Project name when optional W&B logging is enabled.
+
+optimizer:
+  smoothing_weight: 50  # Override the shared cost for changes from the previous pose.
+
+# Default extra [x, y, z] translation in meters for Spine3 and its descendants after rotation.
+# A selected subject YAML can override this value.
+upper_body_offset:
+- 0.03
+- 0.0
+- 0.065

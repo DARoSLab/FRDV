@@ -1,0 +1,24 @@
+
+# pixi environments
+.pixi
+*.egg-info
+outputs/
+log/
+wandb/
+__pycache__/
+lafan1/
+jax_cache/
+casadi_jit/
+jit_tmp*
+amass/
+assets/smpl/smplx/
+
+# Keep dataset loader source visible while ignoring downloaded dataset folders.
+!src/mocap_retargeting/data_loading/lafan1/
+!src/mocap_retargeting/data_loading/amass/
+
+# Keep subject calibration YAMLs while downloaded AMASS data stays ignored.
+!conf/task/unitree_g1/subject_scaling/amass/
+
+# macOS Finder metadata
+.DS_Store

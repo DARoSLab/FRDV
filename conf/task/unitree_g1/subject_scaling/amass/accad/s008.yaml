@@ -1,0 +1,32 @@
+# @package _global_
+
+# ACCAD s008: 1 clips with one male body-shape fit.
+# T-pose estimate using the existing calibration transforms and mapped G1 links.
+# Weighted joint RMS: defaults 78.84 mm; estimate 47.02 mm.
+# Review on actual motions with process; rotation retains the AMASS convention.
+defaults:
+- /task/unitree_g1/amass
+- _self_
+mocap:
+  scale:
+  - 0.72973562
+  - 0.89722616
+  - 0.77234465
+  rotation:
+  - 6.123233995736766e-17
+  - -1.0
+  - 0.0
+  - 1.0
+  - 6.123233995736766e-17
+  - 0.0
+  - 0.0
+  - 0.0
+  - 1.0
+  offset:
+  - 0.02942975
+  - -0.00066161
+  - 0.01526931
+upper_body_offset:
+- -0.02367581
+- 3.701e-05
+- 0.00123894

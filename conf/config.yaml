@@ -1,0 +1,6 @@
+# Main Hydra configuration; defaults to LAFAN1 motions and Unitree G1.
+# Load shared settings, then a dataset/robot preset, then any settings in this file.
+defaults:
+  - base
+  - task: unitree_g1/lafan  # Override with task=unitree_g1/amass.
+  - _self_

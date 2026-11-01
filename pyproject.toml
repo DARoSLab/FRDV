@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mocap_retargeting"
+version = "0.1.0"
+description = "Mocap to Robot retargeting tools"
+authors = [
+  { name="dmarew", email="dmarew@umass.edu" },
+]
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "mujoco>=3.0.0",
+    "viser>=0.1.0",
+    "hydra-core>=1.3.0",
+    "omegaconf>=2.3.0",
+    "numpy",
+    "scipy",
+    "pyyaml",
+]
+
+[project.scripts]
+process = "mocap_retargeting.process:main"
+retarget = "mocap_retargeting.retarget:main"
+retarget_post_process = "mocap_retargeting.kinematic_retargeting.refinement.trajectory_refinement:main"
+play = "mocap_retargeting.play:main"

@@ -1,0 +1,44 @@
+# frdv retargeting config. Every value can be overridden on the command line, e.g.
+#   frdv-retarget robot=g1 dataset=lafan1 data=/path/to/lafan1 workers=8 solver.smoothing_weight=20
+# Add your own robots/datasets in ./frdv_conf/{robot,dataset}/<name>.yaml (or $FRDV_CONFIG_DIR);
+# `frdv-retarget --help` lists what is available, `--cfg` prints the composed config.
+defaults:
+  - robot: g1
+  - dataset: lafan1
+  - solver: default
+  - calibration_profile: active  # selected by the CLI using robot.name and dataset.name
+  - scaling: null         # use the dataset/subject default unless explicitly overridden
+  - _self_
+
+data: ???                 # a motion file or a folder of them (matched with dataset.glob)
+out: outputs/${robot.name}/${dataset.name}
+limit: null               # only the first N files
+start: 0                  # frame range within each clip
+end: null
+workers: null             # threads (or processes); null = all cores
+mode: auto                # whole files: parallel across clips, sequential for a single clip
+threads: true             # files/sequential: whole clips on threads with the compiled clip solver
+                          # (native C build, else numba); false = the per-frame solver in processes
+save_skeleton: false      # also store the scaled source skeleton (for the viewer)
+vis: false                # open the viewer when done
+port: 8080
+frames: 300               # frdv-check: frames retargeted for the check
+
+calibration:              # optional orientation-marker offsets; active only with dataset.augmentation=true
+  auto: true              # frdv-retarget fits them on the fly when no robot x dataset calibration exists
+  clips: 20               # clips used for the fit (spread over the data folder)
+  iterations: 3
+  stride: 3               # use every Nth solved frame for the fit
+  out: null               # default: calibration/<robot>/<dataset>/base.yaml (or selected subject)
+
+stitch:                   # explicit mode=chunks only: split one clip over workers
+  burn_in: 30             # discarded lead-in frames per chunk
+  seam_tol: 1.0e-6        # handoff stops when 2 re-solved frames match the chunk (rad / m)
+  min_chunk: 300
+
+hydra:
+  run:
+    dir: .
+  output_subdir: null
+  job:
+    chdir: false

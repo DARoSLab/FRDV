@@ -1,0 +1,44 @@
+# Build wheels with the prebuilt native solver (setup.py: frdv._libfrdv) for Linux, macOS and
+# Windows, plus an sdist. Runs on tags and by hand; wheels are uploaded as workflow artifacts.
+# Publishing to PyPI is left out on purpose: add a pypa/gh-action-pypi-publish job when wanted.
+name: wheels
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+
+jobs:
+  wheels:
+    name: wheels (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, ubuntu-24.04-arm, macos-14, macos-13, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pypa/cibuildwheel@v2.23.3
+        env:
+          # one wheel per CPython; the library is plain C called through ctypes, so it does not
+          # depend on the Python version, but per-version wheels keep pip's resolution simple
+          CIBW_BUILD: "cp39-* cp310-* cp311-* cp312-* cp313-*"
+          CIBW_SKIP: "*-musllinux_* *-win32 *-manylinux_i686"
+          # the build is optional in setup.py; fail CI if the library did not make it into the wheel
+          CIBW_TEST_COMMAND: >-
+            python -c "import frdv._native as n; assert n._bundled() is not None, 'no bundled lib';
+            assert n.available(), n.REASON; print('bundled native solver OK:', n._bundled().name)"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheels-${{ matrix.os }}
+          path: wheelhouse/*.whl
+
+  sdist:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pipx run build --sdist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sdist
+          path: dist/*.tar.gz

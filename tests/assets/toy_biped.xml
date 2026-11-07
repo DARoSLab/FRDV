@@ -1,0 +1,84 @@
+<!-- Toy capsule biped for the frdv test suite (written for frdv, MIT; no meshes, no third-party assets).
+     Torso with a free joint, a waist-yaw pelvis, two 6-dof legs (hip yaw/roll/pitch, knee, ankle, toe),
+     shoulder bodies on the torso and five sole sites per foot. -->
+<mujoco model="toy_biped">
+  <compiler angle="radian" boundmass="0.05" boundinertia="1e-4"/>
+  <default>
+    <joint type="hinge" damping="1" armature="0.01"/>
+    <geom type="capsule" density="500" rgba="0.6 0.6 0.7 1"/>
+    <site size="0.01" rgba="1 0 0 1"/>
+  </default>
+  <worldbody>
+    <body name="torso_link" pos="0 0 0.95">
+      <joint name="root" type="free"/>
+      <geom size="0.07 0.12" pos="0 0 0.17"/>
+      <geom size="0.05 0.12" pos="0 0 0.17" quat="0.7071 0.7071 0 0"/>
+      <body name="l_shoulder_site" pos="0 0.12 0.3">
+        <geom type="sphere" size="0.04" contype="0" conaffinity="0"/>
+      </body>
+      <body name="r_shoulder_site" pos="0 -0.12 0.3">
+        <geom type="sphere" size="0.04" contype="0" conaffinity="0"/>
+      </body>
+      <body name="pelvis" pos="0 0 -0.045">
+        <joint name="waist_yaw" axis="0 0 1" range="-1.5 1.5"/>
+        <geom size="0.045 0.08" quat="0.7071 0.7071 0 0"/>
+
+        <body name="L_hipyaw_link" pos="0 0.09 -0.05">
+          <joint name="L_hip_yaw" axis="0 0 1" range="-0.8 0.8"/>
+          <body name="L_hiproll_link">
+            <joint name="L_hip_roll" axis="1 0 0" range="-0.4 0.6"/>
+            <body name="L_hippitch_link">
+              <joint name="L_hip_pitch" axis="0 1 0" range="-2.0 1.2"/>
+              <geom size="0.045" fromto="0 0 0 0 0 -0.36"/>
+              <body name="L_shank_link" pos="0 0 -0.38">
+                <joint name="L_knee" axis="0 1 0" range="0 2.4"/>
+                <geom size="0.04" fromto="0 0 0 0 0 -0.36"/>
+                <body name="L_foot_link" pos="0 0 -0.38">
+                  <joint name="L_ankle" axis="0 1 0" range="-1.0 0.8"/>
+                  <geom size="0.025" fromto="-0.05 0 -0.04 0.10 0 -0.04"/>
+                  <site name="L_HEEL" pos="-0.07 0 -0.065"/>
+                  <site name="L_TOE_HL" pos="0.0 0.03 -0.065"/>
+                  <site name="L_TOE_HR" pos="0.0 -0.03 -0.065"/>
+                  <body name="L_toe_link" pos="0.11 0 -0.04">
+                    <joint name="L_toe" axis="0 1 0" range="-0.6 0.6"/>
+                    <geom size="0.02" fromto="0 0 0 0.05 0 0"/>
+                    <site name="L_TOE_FL" pos="0.05 0.03 -0.025"/>
+                    <site name="L_TOE_FR" pos="0.05 -0.03 -0.025"/>
+                  </body>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+
+        <body name="R_hipyaw_link" pos="0 -0.09 -0.05">
+          <joint name="R_hip_yaw" axis="0 0 1" range="-0.8 0.8"/>
+          <body name="R_hiproll_link">
+            <joint name="R_hip_roll" axis="1 0 0" range="-0.6 0.4"/>
+            <body name="R_hippitch_link">
+              <joint name="R_hip_pitch" axis="0 1 0" range="-2.0 1.2"/>
+              <geom size="0.045" fromto="0 0 0 0 0 -0.36"/>
+              <body name="R_shank_link" pos="0 0 -0.38">
+                <joint name="R_knee" axis="0 1 0" range="0 2.4"/>
+                <geom size="0.04" fromto="0 0 0 0 0 -0.36"/>
+                <body name="R_foot_link" pos="0 0 -0.38">
+                  <joint name="R_ankle" axis="0 1 0" range="-1.0 0.8"/>
+                  <geom size="0.025" fromto="-0.05 0 -0.04 0.10 0 -0.04"/>
+                  <site name="R_HEEL" pos="-0.07 0 -0.065"/>
+                  <site name="R_TOE_HL" pos="0.0 0.03 -0.065"/>
+                  <site name="R_TOE_HR" pos="0.0 -0.03 -0.065"/>
+                  <body name="R_toe_link" pos="0.11 0 -0.04">
+                    <joint name="R_toe" axis="0 1 0" range="-0.6 0.6"/>
+                    <geom size="0.02" fromto="0 0 0 0.05 0 0"/>
+                    <site name="R_TOE_FL" pos="0.05 0.03 -0.025"/>
+                    <site name="R_TOE_FR" pos="0.05 -0.03 -0.025"/>
+                  </body>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+</mujoco>

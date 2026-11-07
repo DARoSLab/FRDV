@@ -1,1 +1,0 @@
-"""Mocap calibration."""

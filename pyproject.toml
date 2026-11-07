@@ -3,31 +3,58 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "mocap_retargeting"
-version = "0.1.0"
-description = "Mocap to Robot retargeting tools"
-authors = [
-  { name="dmarew", email="dmarew@umass.edu" },
-]
+name = "frdv"
+version = "2.0.0"
+description = "Fast, lightweight SQP motion retargeting (numpy + mujoco only) with artifact-free parallel chunk stitching"
 readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "dmarew" }]
 requires-python = ">=3.9"
+dependencies = ["numpy>=1.22", "mujoco>=3.0"]
 classifiers = [
-    "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
-]
-dependencies = [
-    "mujoco>=3.0.0",
-    "viser>=0.1.0",
-    "hydra-core>=1.3.0",
-    "omegaconf>=2.3.0",
-    "numpy",
-    "scipy",
-    "pyyaml",
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Topic :: Scientific/Engineering",
 ]
 
+[project.optional-dependencies]
+fast = ["numba>=0.59"]
+vis = ["viser>=1.0"]
+cli = ["hydra-core>=1.3"]
+test = ["pytest", "scipy"]
+demo = ["numba>=0.59", "viser>=1.0", "hydra-core>=1.3"]
+
 [project.scripts]
-process = "mocap_retargeting.process:main"
-retarget = "mocap_retargeting.retarget:main"
-retarget_post_process = "mocap_retargeting.kinematic_retargeting.refinement.trajectory_refinement:main"
-play = "mocap_retargeting.play:main"
+retarget = "frdv.cli.retarget:main"
+play = "frdv.cli.view:main"
+check = "frdv.cli.check:main"
+new-robot = "frdv.cli.new_robot:main"
+augment = "frdv.cli.calibrate:main"
+demo = "frdv.cli.demo:main"
+
+# Compatibility names for existing commands and scripts.
+calibrate = "frdv.cli.calibrate:main"
+frdv-retarget = "frdv.cli.retarget:main"
+frdv-view = "frdv.cli.view:main"
+frdv-check = "frdv.cli.check:main"
+frdv-new-robot = "frdv.cli.new_robot:main"
+frdv-calibrate = "frdv.cli.calibrate:main"
+frdv-demo = "frdv.cli.demo:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+frdv = ["py.typed", "_native.c", "conf/*.yaml", "conf/**/*.yaml"]
+
+[dependency-groups]
+dev = ["pytest", "scipy"]
+
+[tool.uv]
+default-groups = ["dev"]
+# rebuild the package (uvx --from <path>, uv pip install <path>) whenever the source changes,
+# not only when pyproject.toml does
+cache-keys = [{ file = "pyproject.toml" }, { file = "src/**/*.py" }, { file = "src/**/*.yaml" }, { file = "src/**/*.c" }]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

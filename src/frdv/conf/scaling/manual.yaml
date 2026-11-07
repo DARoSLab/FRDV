@@ -1,0 +1,7 @@
+# @package dataset.scale
+# Dataset/subject starting calibration, with unit conversion handled by dataset.units.
+# Tune and save a separate profile for each subject/body shape and target robot.
+# These XYZ factors act in SOURCE axes, before dataset.rotation.
+mode: manual
+value: ${dataset.manual_scale}
+per_axis: [1.0, 1.0, 1.0]

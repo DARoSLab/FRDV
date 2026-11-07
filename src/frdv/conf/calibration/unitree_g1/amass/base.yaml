@@ -1,0 +1,36 @@
+# @package _global_
+# Calibration for this robot and dataset only. Null manual_scale requires an explicit fit.
+# G1 starting alignment; selected ACCAD subjects override it with fitted V2 values.
+calibration:
+  robot: unitree_g1
+  dataset: amass
+  markers: {}
+dataset:
+  manual_scale:
+  - 0.87
+  - 0.83
+  - 0.75
+  scale:
+    mode: manual
+    value: ${dataset.manual_scale}
+    per_axis:
+    - 1.0
+    - 1.0
+    - 1.0
+  offset:
+  - 0.04
+  - 0.0
+  - 0.0
+  upper_body_offset:
+  - 0.03
+  - 0.0
+  - 0.065
+  robot_target_offset:
+  - 0.0
+  - 0.0
+  - 0.0
+  weights:
+    left_ankle: 2000
+    right_ankle: 2000
+    left_wrist: 1000
+    right_wrist: 1000

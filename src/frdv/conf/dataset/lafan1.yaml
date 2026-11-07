@@ -1,0 +1,166 @@
+# Shared source-format conventions. Robot-specific calibration is in calibration/<robot>/<dataset>/.
+name: lafan1
+format: bvh
+glob: '*.bvh'
+units: 0.01
+rotation:
+- - 0
+  - 0
+  - 1
+- - 1
+  - 0
+  - 0
+- - 0
+  - 1
+  - 0
+root: Hips
+height:
+  source: frame0
+  exclude:
+  - LeftHand_EndSite
+  - RightHand_EndSite
+  margin: 0.0
+ground:
+  mode: frame0
+  margin: 0.0
+augmentation: false
+markers:
+- name: LeftThumb
+  parent: LeftHand
+  offset:
+  - 8
+  - 0
+  - 5
+- name: LeftThirdFinger
+  parent: LeftHand
+  offset:
+  - 8
+  - 0
+  - 0
+- name: LeftLastFinger
+  parent: LeftHand
+  offset:
+  - 8
+  - 0
+  - -5
+- name: RightThumb
+  parent: RightHand
+  offset:
+  - 8
+  - 0
+  - -5
+- name: RightThirdFinger
+  parent: RightHand
+  offset:
+  - 8
+  - 0
+  - 0
+- name: RightLastFinger
+  parent: RightHand
+  offset:
+  - 8
+  - 0
+  - 5
+- name: LeftArmUp
+  parent: LeftArm
+  offset:
+  - 0
+  - 0
+  - 5
+- name: LeftArmDown
+  parent: LeftArm
+  offset:
+  - 0
+  - 0
+  - -5
+- name: LeftForeArmUp
+  parent: LeftForeArm
+  offset:
+  - 0
+  - 0
+  - 5
+- name: LeftForeArmDown
+  parent: LeftForeArm
+  offset:
+  - 0
+  - 0
+  - -5
+- name: RightArmUp
+  parent: RightArm
+  offset:
+  - 0
+  - 0
+  - -5
+- name: RightArmDown
+  parent: RightArm
+  offset:
+  - 0
+  - 0
+  - 5
+- name: RightForeArmUp
+  parent: RightForeArm
+  offset:
+  - 0
+  - 0
+  - -5
+- name: RightForeArmDown
+  parent: RightForeArm
+  offset:
+  - 0
+  - 0
+  - 5
+keypoints:
+  pelvis: Hips
+  spine: Spine
+  left_hip: LeftUpLeg
+  left_knee: LeftLeg
+  left_ankle: LeftFoot
+  left_toe: LeftToe
+  right_hip: RightUpLeg
+  right_knee: RightLeg
+  right_ankle: RightFoot
+  right_toe: RightToe
+  left_shoulder: LeftArm
+  left_elbow: LeftForeArm
+  left_wrist: LeftHand
+  right_shoulder: RightArm
+  right_elbow: RightForeArm
+  right_wrist: RightHand
+  left_thumb: LeftThumb
+  left_middle: LeftThirdFinger
+  left_pinky: LeftLastFinger
+  right_thumb: RightThumb
+  right_middle: RightThirdFinger
+  right_pinky: RightLastFinger
+  left_upper_arm_up: LeftArmUp
+  left_upper_arm_down: LeftArmDown
+  right_upper_arm_up: RightArmUp
+  right_upper_arm_down: RightArmDown
+  left_forearm_up: LeftForeArmUp
+  left_forearm_down: LeftForeArmDown
+  right_forearm_up: RightForeArmUp
+  right_forearm_down: RightForeArmDown
+weights: {}
+manual_scale: null
+scale:
+  mode: limbs
+  value: ${dataset.manual_scale}
+  per_axis:
+  - 1.0
+  - 1.0
+  - 1.0
+upper_body_joints:
+- Spine2
+- Neck
+- Head
+- Head_EndSite
+- LeftShoulder
+- LeftArm
+- LeftForeArm
+- LeftHand
+- LeftHand_EndSite
+- RightShoulder
+- RightArm
+- RightForeArm
+- RightHand
+- RightHand_EndSite

@@ -1,0 +1,23 @@
+# Per-frame IK: tracking + joint regularisation + smoothing, Gauss-Newton SQP.
+smoothing_weight: 10.0      # pull towards the previous frame
+rot_smoothing_scale: 0.25   # root-rotation smoothing relative to smoothing_weight
+max_iter: 1                 # GN iterations per frame (more = closer to the exact per-frame optimum)
+line_search: true
+mu_init: 10.0               # L1 merit penalty
+constraint_activation: 0.10 # only constraints within this margin (m) enter the QP (numpy path)
+warmup_iters: 200           # iterations to converge the first frame of each (cold) solve
+boost_frames: 20            # first frames after a cold start ...
+boost_iters: 100            # ... get up to this many GN iterations
+jit: null                   # null = use numba if installed; false = pure numpy
+
+# --- smoothness ---------------------------------------------------------------------------
+accel_weight: 50.0          # penalise deviation from constant-velocity motion (damps one-frame flicks)
+max_joint_velocity: 20.0    # rad/s cap on any joint between frames (null = none)
+despike:                    # non-causal clean-up of remaining joint snaps (see frdv/smooth.py)
+  enabled: true
+  threshold: 7.5            # rad/s: a step must exceed this ...
+  ratio: 4.0                # ... and be this many times the local median step
+  half_window: 5            # frames re-solved on each side of a spike
+  sigma: 1.5                # Gaussian smoothing (frames)
+  pull_weight: 200.0        # how strongly the re-solve follows the smoothed pose
+  passes: 3

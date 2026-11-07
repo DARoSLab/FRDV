@@ -1,0 +1,4 @@
+# @package dataset.scale
+# Automatic per-segment proportions. Recomputed from each clip's skeleton.
+mode: limbs
+per_axis: [1.0, 1.0, 1.0]

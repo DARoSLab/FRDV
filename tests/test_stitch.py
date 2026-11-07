@@ -1,114 +1,71 @@
-"""Check motion chunk boundaries, overlap blending, and quaternion conventions."""
-
 import numpy as np
-import pytest
-
-from mocap_retargeting.kinematic_retargeting.motion_chunking.chunk_retargeting import (
-    plan_chunks,
-)
-from mocap_retargeting.kinematic_retargeting.motion_chunking.trajectory_stitching import (
-    combine_chunks,
-)
-from mocap_retargeting.kinematic_retargeting.motion_chunking.trajectory_stitching import (
-    blend_trajectories,
-)
+from frdv import IKProblem, ParallelRetargeter, Retargeter, chunk_bounds, handoff
 
 
-@pytest.mark.parametrize("workers", [1, 2, 4])
-@pytest.mark.parametrize("stitch", [False, True])
-@pytest.mark.parametrize(
-    "frames,overlap", [(97, 5), (12, 15), (5, 20), (1, 20), (12, 0)]
-)
-def test_overlapping_chunks_reconstruct_every_frame_in_order(
-    workers, stitch, frames, overlap
-):
-    positions = np.arange(frames * 6, dtype=float).reshape(frames, 2, 3)
-    chunks, size = plan_chunks(
-        positions, workers, overlap, 11, "motion.bvh", [("a", "b")], ["a", "b"], fps=60
-    )
-    results = []
-    for chunk_id, data, first_frame, path, skeleton, names, fps in chunks:
-        assert fps == 60
-        assert np.array_equal(data[0], positions[first_frame - 11])
-        q = np.zeros((len(data), 10))
-        q[:, :3] = data[:, 0]
-        q[:, 6] = 1.0
-        q[:, 7:] = data[:, 1]
-        results.append((chunk_id, q, data))
-    q, mocap = combine_chunks(list(reversed(results)), size, frames, overlap, stitch)
-    q = np.asarray(q)
-    np.testing.assert_array_equal(mocap, positions)
-    np.testing.assert_allclose(q[:, :3], positions[:, 0], atol=1e-12)
-    np.testing.assert_allclose(q[:, 7:], positions[:, 1], atol=1e-12)
-    np.testing.assert_allclose(np.linalg.norm(q[:, 3:7], axis=1), 1.0)
+def _targets(cfg, T=240, seed=0):
+    """Synthetic but kinematically valid targets: FK of a smooth random joint trajectory."""
+    p = IKProblem(cfg)
+    rng = np.random.default_rng(seed)
+    t = np.linspace(0, 1, T)[:, None]
+    phase = rng.uniform(0, 2 * np.pi, p.nv)
+    amp = np.r_[0.3, 0.3, 0.0, 0.0, 0.0, 1.0, np.full(p.nv - 6, 0.3)]
+    out = np.empty((T, p.S, 3))
+    for i in range(T):
+        dv = amp * np.sin(2 * np.pi * 1.5 * t[i] + phase)
+        dv[5] = 1.0 * t[i, 0]  # turn
+        q = p.integrate(p.q_nominal, dv)
+        q[7:] = np.clip(q[7:], p.kin.q_min, p.kin.q_max)
+        p.kin.forward(q, with_jac=False)
+        out[i] = p.kin.positions(p.pts)[: p.S]
+    return out
 
 
-@pytest.mark.parametrize("overlap", [2, 6, 15])
-def test_earlier_worker_skips_covered_sections_and_blends_directly_into_next_contributor(
-    overlap,
-):
-    positions = np.zeros((12, 1, 3))
-    positions[:, 0, 0] = np.arange(12)
-    chunks, size = plan_chunks(
-        positions, 3, overlap, 0, "motion.npz", [], ["Pelvis"], fps=120
-    )
-    results = []
-    for chunk_id, mocap, *_ in chunks:
-        q = np.zeros((len(mocap), 8))
-        q[:, 0] = mocap[:, 0, 0]
-        q[:, 6] = 1
-        q[:, 7] = [10, 100, 20][chunk_id]
-        results.append((chunk_id, q, mocap))
-    q, mocap = combine_chunks(results, size, 12, overlap, True)
-    q = np.asarray(q)
-    np.testing.assert_array_equal(np.asarray(mocap), positions)
-    np.testing.assert_array_equal(q[:, 0], np.arange(12))
-    if overlap == 2:
-        # Normal-size overlaps retain the existing A/B and B/C transitions.
-        expected = [10] * 5 + [100] * 4 + [20] * 3
-    elif overlap == 6:
-        # A owns frames 1-8, A/C blend on 9-10, C owns 11-12. B is unused.
-        expected = [10] * 9 + [20] * 3
-    else:
-        # A already covers the whole motion, so no handoff is needed.
-        expected = [10] * 12
-    np.testing.assert_allclose(q[:, 7], expected)
+def test_chunk_bounds_cover():
+    b = chunk_bounds(1000, 7)
+    assert b[0][0] == 0 and b[-1][1] == 1000
+    assert all(x[1] == y[0] for x, y in zip(b, b[1:]))
 
 
-@pytest.mark.parametrize("stitch", [False, True])
-@pytest.mark.parametrize(
-    "failure", ["missing", "duplicate", "empty", "truncated", "nonfinite"]
-)
-def test_combining_rejects_missing_or_invalid_results(stitch, failure):
-    positions = np.zeros((12, 1, 3))
-    chunks, size = plan_chunks(
-        positions, 3, 2, 0, "motion.npz", [], ["Pelvis"], fps=120
-    )
-    results = []
-    for chunk_id, mocap, *_ in chunks:
-        q = np.zeros((len(mocap), 8))
-        q[:, 6] = 1
-        results.append((chunk_id, q, mocap))
-    if failure == "missing":
-        results.pop(1)
-    elif failure == "duplicate":
-        results.append(results[1])
-    elif failure == "empty":
-        results[1] = (1, [], [])
-    elif failure == "truncated":
-        results[1] = (1, results[1][1][:-1], results[1][2][:-1])
-    else:
-        results[1][1][0, 7] = np.nan
-    with pytest.raises(ValueError, match="chunk IDs|Chunk 1"):
-        combine_chunks(results, size, 12, 2, stitch)
+def test_handoff_reproduces_sequential(ik_cfg):
+    targets = _targets(ik_cfg)
+    r = Retargeter(ik_cfg)
+    seq = r.run(targets)
+
+    # Emulate the parallel phase in-process with deliberately short burn-in.
+    bounds = chunk_bounds(len(targets), 4)
+    q = np.empty_like(seq)
+    for k, (s, e) in enumerate(bounds):
+        a = max(0, s - 5) if k else 0
+        q[s:e] = r.run(targets[a:e])[s - a:]
+    gap_before = max(np.abs(r.problem.difference(seq[s], q[s])).max() for s, _ in bounds[1:])
+    handoff(r, targets, q, bounds, seam_tol=1e-6)
+    err = max(np.abs(r.problem.difference(a, b)).max() for a, b in zip(seq, q))
+    assert gap_before > 1e-4          # the seams really were inconsistent
+    assert err < 1e-4                 # ...and the handoff made it match the sequential solve
 
 
-def test_blending_antipodal_quaternions_preserves_the_rotation():
-    left = np.zeros((9, 10))
-    right = np.ones((9, 10))
-    left[:, 3:7] = [0, 0, 0, 1]
-    right[:, 3:7] = [0, 0, 0, -1]
-    blended = blend_trajectories(left, right)
-    np.testing.assert_allclose(blended[:, 3:7], np.tile([0, 0, 0, 1], (9, 1)))
-    np.testing.assert_allclose(blended[0, :3], left[0, :3])
-    np.testing.assert_allclose(blended[-1, :3], right[-1, :3])
+def test_parallel_pool(ik_cfg):
+    targets = _targets(ik_cfg, T=300, seed=1)
+    seq = Retargeter(ik_cfg).run(targets)
+    with ParallelRetargeter(ik_cfg, n_workers=3, min_chunk=50, seam_tol=1e-6) as pr:
+        q, rep = pr.run(targets, return_report=True)
+    assert len(rep.chunk_bounds) == 3
+    assert np.abs(q - seq).max() < 1e-3
+
+
+def test_run_many_matches_sequential(ik_cfg):
+    clips = [_targets(ik_cfg, T=80 + 20 * i, seed=i) for i in range(4)]
+    r = Retargeter(ik_cfg)
+    with ParallelRetargeter(ik_cfg, n_workers=2) as pr:
+        out = pr.run_many(clips)
+    for c, q in zip(clips, out):
+        assert np.abs(q - r.run(c)).max() < 1e-9
+
+
+def test_continuous_quaternions():
+    from frdv import continuous_quaternions
+    q = np.zeros((5, 7))
+    q[:, 3] = 1.0
+    q[2:4, 3:7] *= -1                    # frames 2-3 in the other hemisphere
+    assert continuous_quaternions(q) == 2
+    assert np.all(q[:, 3] > 0)

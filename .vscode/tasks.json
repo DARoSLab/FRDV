@@ -2,40 +2,21 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Play Browser",
-            "type": "shell",
-            "command": "echo Browser Opened",
+            "label": "Retarget LAFAN1 sample to G1",
+            "type": "process",
+            "command": "uv",
             "args": [
-                "${input:openPlayBrowser}"
+                "run", "--extra", "fast", "--extra", "cli", "frdv-retarget",
+                "robot=g1", "data=assets/mocap/sample/walk3_subject5.bvh", "out=outputs/sample_g1"
             ],
             "problemMatcher": []
         },
         {
-            "label": "Preprocess Browser",
-            "type": "shell",
-            "command": "echo Browser Opened",
-            "args": [
-                "${input:openProcessBrowser}"
-            ],
+            "label": "View retargeted sample",
+            "type": "process",
+            "command": "uv",
+            "args": ["run", "--extra", "cli", "--extra", "vis", "frdv-view", "outputs/sample_g1"],
             "problemMatcher": []
-        }
-    ],
-    "inputs": [
-        {
-            "id": "openPlayBrowser",
-            "type": "command",
-            "command": "simpleBrowser.show",
-            "args": [
-                "http://localhost:8085"
-            ]
-        },
-        {
-            "id": "openProcessBrowser",
-            "type": "command",
-            "command": "simpleBrowser.show",
-            "args": [
-                "http://localhost:8080"
-            ]
         }
     ]
 }

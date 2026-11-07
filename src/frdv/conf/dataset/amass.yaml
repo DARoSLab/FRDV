@@ -1,0 +1,65 @@
+# Shared source-format conventions. Robot-specific calibration is in calibration/<robot>/<dataset>/.
+name: amass
+format: amass
+glob: '**/*.npz'
+smplh_model_path: ${oc.env:SMPLH_MODEL_PATH,null}
+units: 1.0
+rotation:
+- - 0.0
+  - -1.0
+  - 0.0
+- - 1.0
+  - 0.0
+  - 0.0
+- - 0.0
+  - 0.0
+  - 1.0
+root: Pelvis
+height:
+  source: rest
+  margin: 0.1
+ground:
+  mode: none
+  joints:
+  - L_Ankle
+  - R_Ankle
+  margin: 0.0
+upper_body_joints:
+- Spine3
+- Neck
+- L_Collar
+- R_Collar
+- Head
+- L_Shoulder
+- R_Shoulder
+- L_Elbow
+- R_Elbow
+- L_Wrist
+- R_Wrist
+augmentation: false
+markers: []
+keypoints:
+  pelvis: Spine1
+  left_hip: L_Hip
+  left_knee: L_Knee
+  left_ankle: L_Ankle
+  left_toe: L_Foot
+  right_hip: R_Hip
+  right_knee: R_Knee
+  right_ankle: R_Ankle
+  right_toe: R_Foot
+  left_shoulder: L_Shoulder
+  left_elbow: L_Elbow
+  left_wrist: L_Wrist
+  right_shoulder: R_Shoulder
+  right_elbow: R_Elbow
+  right_wrist: R_Wrist
+weights: {}
+manual_scale: null
+scale:
+  mode: limbs
+  value: ${dataset.manual_scale}
+  per_axis:
+  - 1.0
+  - 1.0
+  - 1.0

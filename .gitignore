@@ -1,24 +1,26 @@
-
-# pixi environments
-.pixi
-*.egg-info
-outputs/
-log/
-wandb/
+# Generated environments, builds, and caches
+.venv/
+.pixi/
+/build/
+/dist/
+*.egg-info/
 __pycache__/
-lafan1/
-jax_cache/
-casadi_jit/
-jit_tmp*
-amass/
-assets/smpl/smplx/
-
-# Keep dataset loader source visible while ignoring downloaded dataset folders.
-!src/mocap_retargeting/data_loading/lafan1/
-!src/mocap_retargeting/data_loading/amass/
-
-# Keep subject calibration YAMLs while downloaded AMASS data stays ignored.
-!conf/task/unitree_g1/subject_scaling/amass/
-
-# macOS Finder metadata
+.pytest_cache/
+MUJOCO_LOG.TXT
 .DS_Store
+
+# Generated results, user configuration, and third-party checkouts
+/outputs/
+/log/
+/wandb/
+/frdv_conf/
+/lafan1/
+/amass/
+/assets/smpl/smplx/
+
+# Native solver built in place by editable installs
+/src/frdv/_libfrdv*
+
+# Local benchmark implementation and raw outputs; publish only the timing summary
+/benchmarks/*
+!/benchmarks/benchmark_nov_8_2026.md

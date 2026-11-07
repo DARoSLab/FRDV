@@ -1,0 +1,91 @@
+# Unitree G1, 29 dof.  Robot configs map *canonical keypoints* to robot links; the dataset
+# config maps the same canonical names to its skeleton joints.  Only keypoints present in both
+# are tracked.  Create a new robot config with:  frdv-new-robot xml=/path/robot.xml name=myrobot
+name: unitree_g1
+xml: ${menagerie:unitree_g1}   # MuJoCo Menagerie G1, downloaded on first use (or any path)
+height: 1.32              # m, used to scale performers (null = measured from the model)
+nominal_key: null         # keyframe used as regularisation target and initial guess (null = qpos0) ...
+nominal_joints:           # ... with these joints set (T-pose arms)
+  left_shoulder_pitch_joint: 0.02
+  left_shoulder_roll_joint: 1.52
+  left_shoulder_yaw_joint: 0.08
+  left_elbow_joint: 1.52
+  left_wrist_roll_joint: -0.87
+  right_shoulder_pitch_joint: 0.02
+  right_shoulder_roll_joint: -1.52
+  right_shoulder_yaw_joint: 0.08
+  right_elbow_joint: 1.52
+  right_wrist_roll_joint: 0.87
+joint_limits:             # tighter than the model's hardware limits: keeps retargeted motion in a safe range
+  left_hip_pitch_joint: [-1.57, 1.57]
+  right_hip_pitch_joint: [-1.57, 1.57]
+  left_hip_roll_joint: [-0.524, 1.57]
+  right_hip_roll_joint: [-1.57, 0.524]
+  left_hip_yaw_joint: [-1.57, 1.57]
+  right_hip_yaw_joint: [-1.57, 1.57]
+  waist_yaw_joint: [-1.57, 1.57]
+  left_shoulder_pitch_joint: [-3.089, 1.149]
+  right_shoulder_pitch_joint: [-3.089, 1.149]
+  left_shoulder_roll_joint: [-0.6, 2.252]
+  right_shoulder_roll_joint: [-2.252, 0.6]
+  left_shoulder_yaw_joint: [-1.4, 2.0]
+  right_shoulder_yaw_joint: [-2.0, 1.4]
+  left_elbow_joint: [-1.047, 1.7]
+  right_elbow_joint: [-1.047, 1.7]
+target_offset: [0.03, 0.0, 0.0]
+
+keypoints:                # canonical name: {link: body or site name, weight}
+  pelvis:             {link: pelvis, weight: 1000}
+  spine:              {link: waist_yaw_link, weight: 1000}
+  left_hip:           {link: left_hip_pitch_link, weight: 1000}
+  left_knee:          {link: left_knee_link, weight: 1000}
+  left_ankle:         {link: left_ankle_pitch_link, weight: 1000}
+  left_toe:           {link: left_ankle_roll_link, weight: 1000, offset: [0.1, 0.0, -0.02]}
+  right_hip:          {link: right_hip_pitch_link, weight: 1000}
+  right_knee:         {link: right_knee_link, weight: 1000}
+  right_ankle:        {link: right_ankle_pitch_link, weight: 1000}
+  right_toe:          {link: right_ankle_roll_link, weight: 1000, offset: [0.1, 0.0, -0.02]}
+  left_shoulder:      {link: left_shoulder_pitch_link, weight: 1000}
+  left_elbow:         {link: left_elbow_link, weight: 1000}
+  left_wrist:         {link: left_wrist_yaw_link, weight: 500, offset: [0.0415, 0.003, 0.0]}
+  right_shoulder:     {link: right_shoulder_pitch_link, weight: 1000}
+  right_elbow:        {link: right_elbow_link, weight: 1000}
+  right_wrist:        {link: right_wrist_yaw_link, weight: 500, offset: [0.0415, -0.003, 0.0]}
+  # Orientation markers: rigidly attached to the link that carries the rotation (fingers on the
+  # wrist, upper-arm markers on the shoulder-yaw link, forearm markers on the wrist-roll link that
+  # carries pronation). `calibrate: true` = offset fitted from data by augment (stored per
+  # dataset in calibration/<robot>/<dataset>/base.yaml); run automatically if missing.
+  # Weights tuned on held-out LAFAN1 clips (hand-orientation vs limb-direction fidelity).
+  left_thumb:           {link: left_wrist_yaw_link, weight: 1000, calibrate: true}
+  left_middle:          {link: left_wrist_yaw_link, weight: 1000, calibrate: true}
+  left_pinky:           {link: left_wrist_yaw_link, weight: 1000, calibrate: true}
+  right_thumb:          {link: right_wrist_yaw_link, weight: 1000, calibrate: true}
+  right_middle:         {link: right_wrist_yaw_link, weight: 1000, calibrate: true}
+  right_pinky:          {link: right_wrist_yaw_link, weight: 1000, calibrate: true}
+  left_upper_arm_up:    {link: left_shoulder_yaw_link, weight: 250, calibrate: true}
+  left_upper_arm_down:  {link: left_shoulder_yaw_link, weight: 250, calibrate: true}
+  right_upper_arm_up:   {link: right_shoulder_yaw_link, weight: 250, calibrate: true}
+  right_upper_arm_down: {link: right_shoulder_yaw_link, weight: 250, calibrate: true}
+  left_forearm_up:      {link: left_wrist_roll_link, weight: 1000, calibrate: true}
+  left_forearm_down:    {link: left_wrist_roll_link, weight: 1000, calibrate: true}
+  right_forearm_up:     {link: right_wrist_roll_link, weight: 1000, calibrate: true}
+  right_forearm_down:   {link: right_wrist_roll_link, weight: 1000, calibrate: true}
+
+foot_points:
+  - {link: left_ankle_roll_link, offset: [0.0265, 0.0001, -0.0354]}
+  - {link: left_ankle_roll_link, offset: [-0.05, 0.025, -0.035]}
+  - {link: left_ankle_roll_link, offset: [-0.05, -0.025, -0.035]}
+  - {link: left_ankle_roll_link, offset: [0.12, 0.03, -0.035]}
+  - {link: left_ankle_roll_link, offset: [0.12, -0.03, -0.035]}
+  - {link: right_ankle_roll_link, offset: [0.0265, -0.0001, -0.0354]}
+  - {link: right_ankle_roll_link, offset: [-0.05, 0.025, -0.035]}
+  - {link: right_ankle_roll_link, offset: [-0.05, -0.025, -0.035]}
+  - {link: right_ankle_roll_link, offset: [0.12, 0.03, -0.035]}
+  - {link: right_ankle_roll_link, offset: [0.12, -0.03, -0.035]}
+ground_points: auto       # extreme surface points of every link stay above the floor
+capsule_ground: true      # keep every collision capsule above the floor
+joint_reg_weight: 1.0     # pull towards the nominal pose ...
+joint_reg_weights: {}     # ... per joint name overrides, e.g. {left_ankle_roll_joint: 50}
+self_collision:
+  pairs: []               # [[bodyA, bodyB], ...] capsule pairs kept apart
+  margin: 0.05

@@ -1,0 +1,21 @@
+# @package _global_
+# V2 G1 reference fit. Inherits ../../base.yaml; values are reused across this subject folder.
+dataset:
+  manual_scale:
+  - 0.7588038389761419
+  - 0.7329451333069821
+  - 0.7705721814267062
+  scale:
+    mode: manual
+  offset:
+  - 0.028434588519142795
+  - -0.0004087871437625423
+  - 0.016481195206168787
+  upper_body_offset:
+  - 0.02829138109458714
+  - -0.002418131382213838
+  - -0.029645429906668644
+calibration:
+  body_fit:
+    method: smplh_rest_to_v2_reference
+    reference_rms_mm: 42.48526922539732

@@ -1,0 +1,99 @@
+# @package _global_
+# Calibration for this robot and dataset only. Null manual_scale requires an explicit fit.
+calibration:
+  robot: unitree_g1
+  dataset: lafan1
+  markers:
+    robot: unitree_g1
+    dataset: lafan1
+    fitted: '2026-11-01T13:45:29'
+    clips: 20
+    frames: 40756
+    offsets:
+      left_thumb:
+      - 0.114
+      - 0.01798
+      - 0.05034
+      left_middle:
+      - 0.12121
+      - 0.01628
+      - 0.00918
+      left_pinky:
+      - 0.12841
+      - 0.01457
+      - -0.03197
+      right_thumb:
+      - 0.11363
+      - -0.01988
+      - 0.05208
+      right_middle:
+      - 0.12096
+      - -0.01565
+      - 0.01014
+      right_pinky:
+      - 0.12828
+      - -0.01141
+      - -0.0318
+      left_upper_arm_up:
+      - 0.02149
+      - -0.00787
+      - 0.12803
+      left_upper_arm_down:
+      - -9.0e-05
+      - -0.07327
+      - 0.11833
+      right_upper_arm_up:
+      - 0.02355
+      - 0.00386
+      - 0.12979
+      right_upper_arm_down:
+      - 0.00501
+      - 0.07112
+      - 0.12148
+      left_forearm_up:
+      - -0.09393
+      - 0.00939
+      - 0.02068
+      left_forearm_down:
+      - -0.08709
+      - -0.00845
+      - -0.04036
+      right_forearm_up:
+      - -0.09567
+      - -0.0089
+      - 0.02046
+      right_forearm_down:
+      - -0.08721
+      - 0.0125
+      - -0.04085
+    spread_cm:
+      left_thumb: 1.31
+      left_middle: 1.02
+      left_pinky: 1.38
+      right_thumb: 1.28
+      right_middle: 1.02
+      right_pinky: 1.34
+      left_upper_arm_up: 2.06
+      left_upper_arm_down: 1.91
+      right_upper_arm_up: 1.89
+      right_upper_arm_down: 1.86
+      left_forearm_up: 1.39
+      left_forearm_down: 1.7
+      right_forearm_up: 1.4
+      right_forearm_down: 1.69
+dataset:
+  manual_scale:
+  - 0.76
+  - 0.78
+  - 0.74
+  scale:
+    mode: limbs
+    value: ${dataset.manual_scale}
+    per_axis:
+    - 1.0
+    - 1.0
+    - 1.0
+  offset:
+  - 0.0
+  - 0.0
+  - 0.0
